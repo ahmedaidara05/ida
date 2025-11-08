@@ -177,7 +177,7 @@
         }
 
         .chat-messages {
-            height: calc(100% - 130px);
+            height: calc(100% - 150px);
             padding: 20px;
             overflow-y: auto;
             background-color: #e5ddd5;
@@ -245,14 +245,14 @@
             margin-left: 10px;
         }
 
-        .chat-input {
-            height: 80px;
-            padding: 10px 15px;
-            background-color: #f0f0f0;
-            display: flex;
-            align-items: center;
-            border-top: 1px solid #e0e0e0;
-        }
+     .chat-input {
+    height: 70px;
+    padding: 8px 15px;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #e0e0e0;
+}
 
         .input-actions {
             display: flex;
@@ -627,10 +627,9 @@
             if (message.type === 'text') {
                 contentHtml = `<div class="message-content">${message.content}</div>`;
             } else if (message.type === 'image') {
-                contentHtml = `
-                    <div class="message-content">${message.caption || ''}</div>
-                    <img class="message-image" src="${message.content}" alt="Image partagée">
-                `;
+               contentHtml = `
+    <img class="message-image" src="${message.content}" alt="Image partagée" onclick="openImageFullscreen('${message.content}')">
+`;
             } else if (message.type === 'video') {
                 contentHtml = `
                     <div class="message-content">${message.caption || ''}</div>
@@ -748,7 +747,7 @@
                     
                     reader.onload = function(event) {
                         const base64 = event.target.result;
-                        sendMessage('image', base64, 'Image partagée');
+                        sendMessage('image', base64, '');
                     };
                     
                     reader.readAsDataURL(file);
@@ -771,7 +770,7 @@
                     
                     reader.onload = function(event) {
                         const base64 = event.target.result;
-                        sendMessage('video', base64, 'Vidéo partagée');
+                        sendMessage('video', base64, '');
                     };
                     
                     reader.readAsDataURL(file);
