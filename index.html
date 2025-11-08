@@ -240,24 +240,33 @@
 
         .message {
             max-width: 75%;
-            padding: 8px 12px;
             margin-bottom: 8px;
-            border-radius: 8px;
             position: relative;
             word-wrap: break-word;
             font-size: 15px;
             line-height: 1.4;
         }
 
+        .text-message {
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
         .sent {
-            background-color: #d9fdd3;
             margin-left: auto;
+        }
+
+        .sent .text-message {
+            background-color: #d9fdd3;
             border-top-right-radius: 0;
         }
 
         .received {
-            background-color: white;
             margin-right: auto;
+        }
+
+        .received .text-message {
+            background-color: white;
             border-top-left-radius: 0;
             box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
         }
@@ -271,6 +280,7 @@
             justify-content: flex-end;
             align-items: center;
             gap: 4px;
+            padding: 0 4px;
         }
 
         .message-status {
@@ -280,16 +290,20 @@
         .message-image {
             max-width: 100%;
             border-radius: 8px;
-            margin-top: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
             max-height: 200px;
             object-fit: cover;
+        }
+
+        .message-image:hover {
+            transform: scale(1.02);
         }
 
         .audio-message {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 6px;
         }
 
         .audio-player {
@@ -371,7 +385,7 @@
             background-color: #e5f6ff;
         }
 
-        .ahmed-theme .sent {
+        .ahmed-theme .sent .text-message {
             background-color: #0084ff;
             color: white;
         }
@@ -385,7 +399,7 @@
             background-color: #fff0f0;
         }
 
-        .ida-theme .sent {
+        .ida-theme .sent .text-message {
             background-color: #ff6b6b;
             color: white;
         }
@@ -394,39 +408,43 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
-        .typing-indicator {
-            display: flex;
+        /* Modal pour image plein écran */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
             align-items: center;
-            gap: 5px;
-            padding: 8px 12px;
-            background-color: white;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            width: fit-content;
-            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-            font-size: 13px;
-            color: #667781;
         }
 
-        .typing-dots {
+        .image-modal.active {
             display: flex;
-            gap: 2px;
         }
 
-        .typing-dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background-color: #667781;
-            animation: typing 1.4s infinite ease-in-out;
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
         }
 
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .modal-content img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
 
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-            40% { transform: scale(1); opacity: 1; }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 1001;
         }
     </style>
 </head>
@@ -501,6 +519,14 @@
         </div>
     </div>
 
+    <!-- Modal pour image plein écran -->
+    <div id="imageModal" class="image-modal">
+        <span class="close-modal">&times;</span>
+        <div class="modal-content">
+            <img id="fullSizeImage" src="" alt="Image en plein écran">
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script>
@@ -545,16 +571,23 @@
         const fileInput = document.getElementById('fileInput');
         const recordBtn = document.getElementById('recordBtn');
         const container = document.querySelector('.container');
+        const imageModal = document.getElementById('imageModal');
+        const fullSizeImage = document.getElementById('fullSizeImage');
+        const closeModal = document.querySelector('.close-modal');
 
         // Vérifier si l'utilisateur est déjà connecté
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
+                // L'utilisateur est déjà connecté, passer directement à la messagerie
                 currentUser = savedUser;
                 showChatScreen();
                 setupUser();
                 loadMessages();
                 setupPresence();
+            } else {
+                // Nouvel utilisateur, afficher l'écran de mot de passe
+                passwordScreen.classList.add('active');
             }
         });
 
@@ -574,12 +607,13 @@
             }
         }
 
-        // Sélection de l'utilisateur
+        // Sélection de l'utilisateur (une seule fois)
         ahmedBtn.addEventListener('click', () => selectUser('Ahmed'));
         idaBtn.addEventListener('click', () => selectUser('Ida'));
 
         function selectUser(user) {
             currentUser = user;
+            // Sauvegarder dans le localStorage pour les futures connexions
             localStorage.setItem('currentUser', user);
             userScreen.classList.remove('active');
             showChatScreen();
@@ -682,13 +716,18 @@
             messageDiv.dataset.id = messageId;
             
             let messageContent = '';
+            let hasBackground = false;
             
             if (message.type === 'text') {
-                messageContent = message.content;
+                messageContent = `<div class="text-message">${message.content}</div>`;
+                hasBackground = true;
             } else if (message.type === 'image') {
-                // Afficher l'image directement pour les deux utilisateurs
-                messageContent = `<img src="${message.imageUrl}" class="message-image" alt="Image envoyée">`;
+                // Image sans fond
+                messageContent = `
+                    <img src="${message.imageUrl}" class="message-image" alt="Image envoyée" data-fullimage="${message.imageUrl}">
+                `;
             } else if (message.type === 'audio') {
+                // Audio sans fond
                 messageContent = `
                     <div class="audio-message">
                         <i class="fas fa-play-circle" style="font-size: 24px;"></i>
@@ -702,7 +741,7 @@
             const time = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Maintenant';
             
             messageDiv.innerHTML = `
-                <div>${messageContent}</div>
+                ${messageContent}
                 <div class="message-time">
                     ${time}
                     ${message.sender === currentUser ? 
@@ -713,7 +752,27 @@
             `;
             
             chatContainer.appendChild(messageDiv);
+            
+            // Ajouter l'événement pour l'image plein écran
+            if (message.type === 'image') {
+                const imgElement = messageDiv.querySelector('.message-image');
+                imgElement.addEventListener('click', () => {
+                    fullSizeImage.src = imgElement.dataset.fullimage;
+                    imageModal.classList.add('active');
+                });
+            }
         }
+
+        // Fermer le modal
+        closeModal.addEventListener('click', () => {
+            imageModal.classList.remove('active');
+        });
+
+        imageModal.addEventListener('click', (e) => {
+            if (e.target === imageModal) {
+                imageModal.classList.remove('active');
+            }
+        });
 
         // Envoi de messages
         sendBtn.addEventListener('click', sendMessage);
