@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notre Messagerie Privée</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .active {
+            display: flex;
+        }
+
+        /* Écran de mot de passe */
+        .password-screen {
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+
+        .password-form {
+            width: 100%;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #ffd3d3;
+            border-radius: 10px;
+            font-size: 18px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .password-input:focus {
+            border-color: #ff6b6b;
+        }
+
+        .password-btn {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .password-btn:hover {
+            background-color: #ff5252;
+        }
+
+        /* Écran de sélection d'utilisateur */
+        .user-screen {
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .user-title {
+            font-size: 24px;
+            color: #ff6b6b;
+            margin-bottom: 30px;
+        }
+
+        .user-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .user-btn {
+            background-color: #ffd3d3;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-btn:hover {
+            background-color: #ffb8b8;
+            transform: translateY(-2px);
+        }
+
+        .ahmed-btn {
+            color: #ff6b6b;
+        }
+
+        .ida-btn {
+            color: #6b6bff;
+        }
+
+        /* Écran de messagerie */
+        .chat-header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .ahmed-avatar {
+            color: #ff6b6b;
+        }
+
+        .ida-avatar {
+            color: #6b6bff;
+        }
+
+        .online-status {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #4cd964;
+        }
+
+        .offline-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ccc;
+        }
+
+        .chat-container {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .sent {
+            background-color: #ff6b6b;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .received {
+            background-color: #e6e6e6;
+            color: #333;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 10px;
+            text-align: right;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+
+        .message-status {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        .read-indicator {
+            color: #4cd964;
+        }
+
+        .message-image, .message-audio {
+            max-width: 100%;
+            margin-top: 5px;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            resize: none;
+            max-height: 100px;
+        }
+
+        .send-btn, .attach-btn, .record-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #ff6b6b;
+            cursor: pointer;
+            margin-left: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .send-btn:hover, .attach-btn:hover, .record-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        .recording {
+            animation: pulse 1s infinite;
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Écran de mot de passe -->
+        <div id="passwordScreen" class="screen active">
+            <div class="password-screen">
+                <div class="logo">💑 Notre Messagerie</div>
+                <div class="password-form">
+                    <input type="password" id="passwordInput" class="password-input" placeholder="Mot de passe (0000)" maxlength="4">
+                    <button id="passwordBtn" class="password-btn">Entrer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran de sélection d'utilisateur -->
+        <div id="userScreen" class="screen">
+            <div class="user-screen">
+                <div class="user-title">Qui êtes-vous ?</div>
+                <div class="user-buttons">
+                    <button id="ahmedBtn" class="user-btn ahmed-btn">AHMED</button>
+                    <button id="idaBtn" class="user-btn ida-btn">IDA</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran de messagerie -->
+        <div id="chatScreen" class="screen">
+            <div class="chat-header">
+                <div class="user-info">
+                    <div id="userAvatar" class="user-avatar ahmed-avatar">A</div>
+                    <div>
+                        <div id="userName">Ahmed</div>
+                        <div class="online-status">
+                            <div id="partnerStatusDot" class="offline-dot"></div>
+                            <span id="partnerStatus">Hors ligne</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="chatContainer" class="chat-container">
+                <!-- Les messages seront ajoutés ici dynamiquement -->
+            </div>
+            <div class="chat-input-container">
+                <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
+                <button id="attachBtn" class="attach-btn">📎</button>
+                <textarea id="messageInput" class="message-input" placeholder="Tapez votre message..."></textarea>
+                <button id="recordBtn" class="record-btn">🎤</button>
+                <button id="sendBtn" class="send-btn">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfJwZNAtT5u9sKdw7R2J7QOcohf2_03Vk",
+            authDomain: "souhaibou-4883d.firebaseapp.com",
+            projectId: "souhaibou-4883d",
+            storageBucket: "souhaibou-4883d.firebasestorage.app",
+            messagingSenderId: "703566382245",
+            appId: "1:703566382245:web:82e265798635786bb8794c",
+            measurementId: "G-SW6XGD9YHY"
+        };
+
+        // Initialisation Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Variables globales
+        let currentUser = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let lastMessageId = null;
+
+        // Éléments DOM
+        const passwordScreen = document.getElementById('passwordScreen');
+        const userScreen = document.getElementById('userScreen');
+        const chatScreen = document.getElementById('chatScreen');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordBtn = document.getElementById('passwordBtn');
+        const ahmedBtn = document.getElementById('ahmedBtn');
+        const idaBtn = document.getElementById('idaBtn');
+        const userName = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
+        const partnerStatusDot = document.getElementById('partnerStatusDot');
+        const partnerStatus = document.getElementById('partnerStatus');
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const attachBtn = document.getElementById('attachBtn');
+        const fileInput = document.getElementById('fileInput');
+        const recordBtn = document.getElementById('recordBtn');
+
+        // Vérifier si l'utilisateur est déjà connecté
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = savedUser;
+                showChatScreen();
+                setupUser();
+                loadMessages();
+                setupPresence();
+            }
+        });
+
+        // Gestion du mot de passe
+        passwordBtn.addEventListener('click', checkPassword);
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPassword();
+        });
+
+        function checkPassword() {
+            if (passwordInput.value === '0000') {
+                passwordScreen.classList.remove('active');
+                userScreen.classList.add('active');
+            } else {
+                alert('Mot de passe incorrect. Essayez 0000.');
+                passwordInput.value = '';
+            }
+        }
+
+        // Sélection de l'utilisateur
+        ahmedBtn.addEventListener('click', () => selectUser('Ahmed'));
+        idaBtn.addEventListener('click', () => selectUser('Ida'));
+
+        function selectUser(user) {
+            currentUser = user;
+            localStorage.setItem('currentUser', user);
+            userScreen.classList.remove('active');
+            showChatScreen();
+            setupUser();
+            loadMessages();
+            setupPresence();
+        }
+
+        function setupUser() {
+            userName.textContent = currentUser;
+            if (currentUser === 'Ahmed') {
+                userAvatar.textContent = 'A';
+                userAvatar.className = 'user-avatar ahmed-avatar';
+            } else {
+                userAvatar.textContent = 'I';
+                userAvatar.className = 'user-avatar ida-avatar';
+            }
+        }
+
+        function showChatScreen() {
+            chatScreen.classList.add('active');
+        }
+
+        // Configuration de la présence en ligne
+        function setupPresence() {
+            const partner = currentUser === 'Ahmed' ? 'Ida' : 'Ahmed';
+            
+            // Référence à la présence du partenaire
+            const partnerPresenceRef = db.collection('presence').doc(partner);
+            
+            // Mettre à jour la présence de l'utilisateur actuel
+            const userPresenceRef = db.collection('presence').doc(currentUser);
+            
+            // Écouter les changements de présence du partenaire
+            partnerPresenceRef.onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.online) {
+                        partnerStatusDot.className = 'online-dot';
+                        partnerStatus.textContent = 'En ligne';
+                    } else {
+                        partnerStatusDot.className = 'offline-dot';
+                        partnerStatus.textContent = 'Hors ligne';
+                    }
+                }
+            });
+            
+            // Mettre à jour la présence de l'utilisateur actuel
+            userPresenceRef.set({
+                online: true,
+                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Gérer la déconnexion
+            window.addEventListener('beforeunload', () => {
+                userPresenceRef.set({
+                    online: false,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            });
+        }
+
+        // Chargement des messages
+        function loadMessages() {
+            db.collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot((snapshot) => {
+                    chatContainer.innerHTML = '';
+                    snapshot.forEach((doc) => {
+                        const message = doc.data();
+                        displayMessage(message);
+                        lastMessageId = doc.id;
+                    });
+                    
+                    // Marquer les messages comme lus
+                    if (currentUser === 'Ahmed') {
+                        markMessagesAsRead('Ida');
+                    } else {
+                        markMessagesAsRead('Ahmed');
+                    }
+                    
+                    scrollToBottom();
+                });
+        }
+
+        function displayMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${message.sender === currentUser ? 'sent' : 'received'}`;
+            
+            let messageContent = '';
+            
+            if (message.type === 'text') {
+                messageContent = message.content;
+            } else if (message.type === 'image') {
+                messageContent = `<div>📷 Image</div><div class="message-image">${message.content}</div>`;
+            } else if (message.type === 'audio') {
+                messageContent = `<div>🎤 Audio</div><audio controls class="audio-player"><source src="${message.content}" type="audio/wav"></audio>`;
+            }
+            
+            const time = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Maintenant';
+            
+            messageDiv.innerHTML = `
+                <div>${messageContent}</div>
+                <div class="message-time">${time}</div>
+                ${message.sender === currentUser ? 
+                    `<div class="message-status">${message.read ? '<span class="read-indicator">✓✓</span>' : '<span>✓</span>'}</div>` : 
+                    ''
+                }
+            `;
+            
+            chatContainer.appendChild(messageDiv);
+        }
+
+        // Envoi de messages
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const content = messageInput.value.trim();
+            if (content) {
+                const message = {
+                    sender: currentUser,
+                    content: content,
+                    type: 'text',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    read: false
+                };
+                
+                db.collection('messages').add(message);
+                messageInput.value = '';
+            }
+        }
+
+        // Envoi de fichiers
+        attachBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileUpload);
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Pour les images, convertir en texte (simulation)
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    // Dans une vraie application, vous enverriez l'image à un service OCR
+                    // Ici, nous simulons juste en envoyant un texte représentant l'image
+                    const imageMessage = {
+                        sender: currentUser,
+                        content: `[Image: ${file.name}]`,
+                        type: 'image',
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        read: false
+                    };
+                    
+                    db.collection('messages').add(imageMessage);
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // Pour les vidéos
+            else if (file.type.startsWith('video/')) {
+                const videoMessage = {
+                    sender: currentUser,
+                    content: `[Vidéo: ${file.name}]`,
+                    type: 'text', // Traité comme texte pour l'instant
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    read: false
+                };
+                
+                db.collection('messages').add(videoMessage);
+            }
+            
+            fileInput.value = '';
+        }
+
+        // Enregistrement audio
+        recordBtn.addEventListener('click', toggleRecording);
+
+        function toggleRecording() {
+            if (!isRecording) {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        }
+
+        function startRecording() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        mediaRecorder = new MediaRecorder(stream);
+                        audioChunks = [];
+                        
+                        mediaRecorder.ondataavailable = (e) => {
+                            audioChunks.push(e.data);
+                        };
+                        
+                        mediaRecorder.onstop = () => {
+                            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                            const audioUrl = URL.createObjectURL(audioBlob);
+                            
+                            // Envoyer l'audio (dans une vraie app, vous l'enverriez à un serveur)
+                            // Ici, nous simulons en envoyant juste un message texte
+                            const audioMessage = {
+                                sender: currentUser,
+                                content: audioUrl,
+                                type: 'audio',
+                                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                                read: false
+                            };
+                            
+                            db.collection('messages').add(audioMessage);
+                        };
+                        
+                        mediaRecorder.start();
+                        isRecording = true;
+                        recordBtn.classList.add('recording');
+                    })
+                    .catch(error => {
+                        console.error('Erreur d\'accès au microphone:', error);
+                        alert('Impossible d\'accéder au microphone');
+                    });
+            } else {
+                alert('Votre navigateur ne supporte pas l\'enregistrement audio');
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordBtn.classList.remove('recording');
+                
+                // Arrêter tous les tracks du stream
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+        }
+
+        // Marquer les messages comme lus
+        function markMessagesAsRead(sender) {
+            db.collection('messages')
+                .where('sender', '==', sender)
+                .where('read', '==', false)
+                .get()
+                .then((snapshot) => {
+                    snapshot.forEach((doc) => {
+                        db.collection('messages').doc(doc.id).update({
+                            read: true
+                        });
+                    });
+                });
+        }
+
+        // Défilement automatique vers le bas
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>
