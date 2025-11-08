@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notre Messagerie Privée</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            background: #f0f2f5;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -23,17 +24,20 @@
 
         .container {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            height: 700px;
             background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .screen {
             display: none;
             flex-direction: column;
-            height: 600px;
+            height: 100%;
         }
 
         .active {
@@ -44,14 +48,21 @@
         .password-screen {
             justify-content: center;
             align-items: center;
-            padding: 30px;
+            padding: 40px;
             text-align: center;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            color: white;
         }
 
         .logo {
-            font-size: 32px;
-            color: #ff6b6b;
+            font-size: 36px;
             margin-bottom: 20px;
+        }
+
+        .app-name {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 30px;
         }
 
         .password-form {
@@ -60,117 +71,135 @@
 
         .password-input {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             margin: 15px 0;
-            border: 2px solid #ffd3d3;
-            border-radius: 10px;
+            border: none;
+            border-radius: 25px;
             font-size: 18px;
             text-align: center;
             outline: none;
-            transition: border-color 0.3s;
-        }
-
-        .password-input:focus {
-            border-color: #ff6b6b;
+            background: rgba(255, 255, 255, 0.9);
         }
 
         .password-btn {
-            background-color: #ff6b6b;
-            color: white;
+            background-color: white;
+            color: #ff6b6b;
             border: none;
-            padding: 15px;
+            padding: 16px;
             width: 100%;
-            border-radius: 10px;
+            border-radius: 25px;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
         }
 
         .password-btn:hover {
-            background-color: #ff5252;
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
         }
 
         /* Écran de sélection d'utilisateur */
         .user-screen {
             justify-content: center;
             align-items: center;
-            padding: 30px;
+            padding: 40px;
             text-align: center;
+            background: #f0f2f5;
         }
 
         .user-title {
             font-size: 24px;
-            color: #ff6b6b;
-            margin-bottom: 30px;
+            color: #3b4a54;
+            margin-bottom: 40px;
+            font-weight: 500;
         }
 
         .user-buttons {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
             width: 100%;
         }
 
         .user-btn {
-            background-color: #ffd3d3;
             border: none;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 18px;
+            border-radius: 12px;
             font-size: 18px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
 
         .user-btn:hover {
-            background-color: #ffb8b8;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .ahmed-btn {
-            color: #ff6b6b;
+            background-color: #0084ff;
+            color: white;
         }
 
         .ida-btn {
-            color: #6b6bff;
+            background-color: #ff6b6b;
+            color: white;
         }
 
         /* Écran de messagerie */
         .chat-header {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
-            color: white;
-            padding: 15px;
+            background-color: #f0f2f5;
+            padding: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid #e9edef;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            background-color: white;
             display: flex;
             justify-content: center;
             align-items: center;
             font-weight: bold;
+            color: white;
+            font-size: 18px;
         }
 
         .ahmed-avatar {
-            color: #ff6b6b;
+            background-color: #0084ff;
         }
 
         .ida-avatar {
-            color: #6b6bff;
+            background-color: #ff6b6b;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #3b4a54;
         }
 
         .online-status {
-            font-size: 12px;
+            font-size: 13px;
+            color: #667781;
             display: flex;
             align-items: center;
             gap: 5px;
@@ -180,109 +209,141 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background-color: #4cd964;
+            background-color: #00a884;
         }
 
         .offline-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background-color: #ccc;
+            background-color: #667781;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 20px;
+            color: #54656f;
+        }
+
+        .header-actions i {
+            font-size: 20px;
+            cursor: pointer;
         }
 
         .chat-container {
             flex: 1;
-            padding: 15px;
+            padding: 16px;
             overflow-y: auto;
-            background-color: #f9f9f9;
+            background-color: #efeae2;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%2300a884' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
         }
 
         .message {
-            max-width: 80%;
-            padding: 10px 15px;
-            margin-bottom: 15px;
-            border-radius: 18px;
+            max-width: 75%;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
             position: relative;
             word-wrap: break-word;
+            font-size: 15px;
+            line-height: 1.4;
         }
 
         .sent {
-            background-color: #ff6b6b;
-            color: white;
+            background-color: #d9fdd3;
             margin-left: auto;
-            border-bottom-right-radius: 5px;
+            border-top-right-radius: 0;
         }
 
         .received {
-            background-color: #e6e6e6;
-            color: #333;
+            background-color: white;
             margin-right: auto;
-            border-bottom-left-radius: 5px;
+            border-top-left-radius: 0;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
         }
 
         .message-time {
-            font-size: 10px;
+            font-size: 11px;
             text-align: right;
-            margin-top: 5px;
-            opacity: 0.7;
+            margin-top: 4px;
+            color: #667781;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 4px;
         }
 
         .message-status {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 5px;
-            font-size: 12px;
+            color: #53bdeb;
         }
 
-        .read-indicator {
-            color: #4cd964;
-        }
-
-        .message-image, .message-audio {
+        .message-image {
             max-width: 100%;
-            margin-top: 5px;
+            border-radius: 8px;
+            margin-top: 6px;
+            max-height: 200px;
+            object-fit: cover;
+        }
+
+        .audio-message {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 6px;
         }
 
         .audio-player {
-            width: 100%;
-            margin-top: 5px;
+            flex: 1;
+            height: 32px;
         }
 
         .chat-input-container {
             display: flex;
-            padding: 15px;
-            background-color: white;
-            border-top: 1px solid #eee;
+            padding: 10px 16px;
+            background-color: #f0f2f5;
+            align-items: flex-end;
+            gap: 10px;
         }
 
         .message-input {
             flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 24px;
             outline: none;
             resize: none;
             max-height: 100px;
+            font-size: 15px;
+            background-color: white;
+            line-height: 1.4;
         }
 
-        .send-btn, .attach-btn, .record-btn {
+        .action-btn {
             background: none;
             border: none;
             font-size: 20px;
-            color: #ff6b6b;
+            color: #54656f;
             cursor: pointer;
-            margin-left: 10px;
             width: 40px;
             height: 40px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s;
         }
 
-        .send-btn:hover, .attach-btn:hover, .record-btn:hover {
-            background-color: #f0f0f0;
+        .action-btn:hover {
+            background-color: #e9edef;
+        }
+
+        .send-btn {
+            background-color: #0084ff;
+            color: white;
+        }
+
+        .send-btn:hover {
+            background-color: #007ae6;
         }
 
         .recording {
@@ -304,6 +365,69 @@
         .file-input {
             display: none;
         }
+
+        /* Thème Ahmed */
+        .ahmed-theme .chat-container {
+            background-color: #e5f6ff;
+        }
+
+        .ahmed-theme .sent {
+            background-color: #0084ff;
+            color: white;
+        }
+
+        .ahmed-theme .message-time {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Thème Ida */
+        .ida-theme .chat-container {
+            background-color: #fff0f0;
+        }
+
+        .ida-theme .sent {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        .ida-theme .message-time {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            width: fit-content;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+            font-size: 13px;
+            color: #667781;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 2px;
+        }
+
+        .typing-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: #667781;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -311,7 +435,8 @@
         <!-- Écran de mot de passe -->
         <div id="passwordScreen" class="screen active">
             <div class="password-screen">
-                <div class="logo">💑 Notre Messagerie</div>
+                <div class="logo"><i class="fas fa-heart"></i></div>
+                <div class="app-name">Notre Messagerie</div>
                 <div class="password-form">
                     <input type="password" id="passwordInput" class="password-input" placeholder="Mot de passe (0000)" maxlength="4">
                     <button id="passwordBtn" class="password-btn">Entrer</button>
@@ -324,8 +449,14 @@
             <div class="user-screen">
                 <div class="user-title">Qui êtes-vous ?</div>
                 <div class="user-buttons">
-                    <button id="ahmedBtn" class="user-btn ahmed-btn">AHMED</button>
-                    <button id="idaBtn" class="user-btn ida-btn">IDA</button>
+                    <button id="ahmedBtn" class="user-btn ahmed-btn">
+                        <i class="fas fa-male"></i>
+                        AHMED
+                    </button>
+                    <button id="idaBtn" class="user-btn ida-btn">
+                        <i class="fas fa-female"></i>
+                        IDA
+                    </button>
                 </div>
             </div>
         </div>
@@ -334,25 +465,38 @@
         <div id="chatScreen" class="screen">
             <div class="chat-header">
                 <div class="user-info">
-                    <div id="userAvatar" class="user-avatar ahmed-avatar">A</div>
-                    <div>
-                        <div id="userName">Ahmed</div>
+                    <div id="userAvatar" class="user-avatar ahmed-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div id="userName" class="user-name">Ahmed</div>
                         <div class="online-status">
                             <div id="partnerStatusDot" class="offline-dot"></div>
                             <span id="partnerStatus">Hors ligne</span>
                         </div>
                     </div>
                 </div>
+                <div class="header-actions">
+                    <i class="fas fa-video"></i>
+                    <i class="fas fa-phone"></i>
+                    <i class="fas fa-ellipsis-vertical"></i>
+                </div>
             </div>
             <div id="chatContainer" class="chat-container">
                 <!-- Les messages seront ajoutés ici dynamiquement -->
             </div>
             <div class="chat-input-container">
+                <button id="attachBtn" class="action-btn">
+                    <i class="fas fa-paperclip"></i>
+                </button>
                 <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
-                <button id="attachBtn" class="attach-btn">📎</button>
-                <textarea id="messageInput" class="message-input" placeholder="Tapez votre message..."></textarea>
-                <button id="recordBtn" class="record-btn">🎤</button>
-                <button id="sendBtn" class="send-btn">➤</button>
+                <textarea id="messageInput" class="message-input" placeholder="Tapez votre message..." rows="1"></textarea>
+                <button id="recordBtn" class="action-btn">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button id="sendBtn" class="action-btn send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -380,7 +524,7 @@
         let mediaRecorder = null;
         let audioChunks = [];
         let isRecording = false;
-        let lastMessageId = null;
+        let unsubscribeMessages = null;
 
         // Éléments DOM
         const passwordScreen = document.getElementById('passwordScreen');
@@ -400,6 +544,7 @@
         const attachBtn = document.getElementById('attachBtn');
         const fileInput = document.getElementById('fileInput');
         const recordBtn = document.getElementById('recordBtn');
+        const container = document.querySelector('.container');
 
         // Vérifier si l'utilisateur est déjà connecté
         window.addEventListener('DOMContentLoaded', () => {
@@ -445,12 +590,17 @@
 
         function setupUser() {
             userName.textContent = currentUser;
+            
             if (currentUser === 'Ahmed') {
-                userAvatar.textContent = 'A';
+                userAvatar.innerHTML = '<i class="fas fa-male"></i>';
                 userAvatar.className = 'user-avatar ahmed-avatar';
+                container.classList.add('ahmed-theme');
+                container.classList.remove('ida-theme');
             } else {
-                userAvatar.textContent = 'I';
+                userAvatar.innerHTML = '<i class="fas fa-female"></i>';
                 userAvatar.className = 'user-avatar ida-avatar';
+                container.classList.add('ida-theme');
+                container.classList.remove('ahmed-theme');
             }
         }
 
@@ -494,55 +644,72 @@
                     online: false,
                     lastSeen: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                
+                // Se désabonner des messages
+                if (unsubscribeMessages) {
+                    unsubscribeMessages();
+                }
             });
         }
 
         // Chargement des messages
         function loadMessages() {
-            db.collection('messages')
+            // Se désabonner d'abord s'il y a un abonnement existant
+            if (unsubscribeMessages) {
+                unsubscribeMessages();
+            }
+            
+            unsubscribeMessages = db.collection('messages')
                 .orderBy('timestamp', 'asc')
                 .onSnapshot((snapshot) => {
                     chatContainer.innerHTML = '';
                     snapshot.forEach((doc) => {
                         const message = doc.data();
-                        displayMessage(message);
-                        lastMessageId = doc.id;
+                        displayMessage(message, doc.id);
                     });
                     
                     // Marquer les messages comme lus
-                    if (currentUser === 'Ahmed') {
-                        markMessagesAsRead('Ida');
-                    } else {
-                        markMessagesAsRead('Ahmed');
-                    }
+                    const partner = currentUser === 'Ahmed' ? 'Ida' : 'Ahmed';
+                    markMessagesAsRead(partner);
                     
                     scrollToBottom();
                 });
         }
 
-        function displayMessage(message) {
+        function displayMessage(message, messageId) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${message.sender === currentUser ? 'sent' : 'received'}`;
+            messageDiv.dataset.id = messageId;
             
             let messageContent = '';
             
             if (message.type === 'text') {
                 messageContent = message.content;
             } else if (message.type === 'image') {
-                messageContent = `<div>📷 Image</div><div class="message-image">${message.content}</div>`;
+                // Afficher l'image directement pour les deux utilisateurs
+                messageContent = `<img src="${message.imageUrl}" class="message-image" alt="Image envoyée">`;
             } else if (message.type === 'audio') {
-                messageContent = `<div>🎤 Audio</div><audio controls class="audio-player"><source src="${message.content}" type="audio/wav"></audio>`;
+                messageContent = `
+                    <div class="audio-message">
+                        <i class="fas fa-play-circle" style="font-size: 24px;"></i>
+                        <audio controls class="audio-player">
+                            <source src="${message.content}" type="audio/wav">
+                        </audio>
+                    </div>
+                `;
             }
             
             const time = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Maintenant';
             
             messageDiv.innerHTML = `
                 <div>${messageContent}</div>
-                <div class="message-time">${time}</div>
-                ${message.sender === currentUser ? 
-                    `<div class="message-status">${message.read ? '<span class="read-indicator">✓✓</span>' : '<span>✓</span>'}</div>` : 
-                    ''
-                }
+                <div class="message-time">
+                    ${time}
+                    ${message.sender === currentUser ? 
+                        `<span class="message-status">${message.read ? '<i class="fas fa-check-double"></i>' : '<i class="fas fa-check"></i>'}</span>` : 
+                        ''
+                    }
+                </div>
             `;
             
             chatContainer.appendChild(messageDiv);
@@ -555,6 +722,12 @@
                 e.preventDefault();
                 sendMessage();
             }
+        });
+
+        // Ajuster la hauteur du textarea automatiquement
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
         });
 
         function sendMessage() {
@@ -570,6 +743,7 @@
                 
                 db.collection('messages').add(message);
                 messageInput.value = '';
+                messageInput.style.height = 'auto';
             }
         }
 
@@ -581,15 +755,14 @@
             const file = e.target.files[0];
             if (!file) return;
             
-            // Pour les images, convertir en texte (simulation)
+            // Pour les images
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    // Dans une vraie application, vous enverriez l'image à un service OCR
-                    // Ici, nous simulons juste en envoyant un texte représentant l'image
                     const imageMessage = {
                         sender: currentUser,
-                        content: `[Image: ${file.name}]`,
+                        content: '',
+                        imageUrl: event.target.result,
                         type: 'image',
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         read: false
@@ -604,8 +777,8 @@
             else if (file.type.startsWith('video/')) {
                 const videoMessage = {
                     sender: currentUser,
-                    content: `[Vidéo: ${file.name}]`,
-                    type: 'text', // Traité comme texte pour l'instant
+                    content: `Vidéo: ${file.name}`,
+                    type: 'text',
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     read: false
                 };
@@ -642,8 +815,6 @@
                             const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                             const audioUrl = URL.createObjectURL(audioBlob);
                             
-                            // Envoyer l'audio (dans une vraie app, vous l'enverriez à un serveur)
-                            // Ici, nous simulons en envoyant juste un message texte
                             const audioMessage = {
                                 sender: currentUser,
                                 content: audioUrl,
@@ -686,11 +857,19 @@
                 .where('read', '==', false)
                 .get()
                 .then((snapshot) => {
+                    const batch = db.batch();
+                    
                     snapshot.forEach((doc) => {
-                        db.collection('messages').doc(doc.id).update({
-                            read: true
-                        });
+                        const messageRef = db.collection('messages').doc(doc.id);
+                        batch.update(messageRef, { read: true });
                     });
+                    
+                    if (snapshot.size > 0) {
+                        return batch.commit();
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors du marquage des messages comme lus:', error);
                 });
         }
 
