@@ -5,135 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notre Messagerie Privée</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
         }
 
         body {
-            background: #f0f2f5;
-            min-height: 100vh;
+            background: linear-gradient(135deg, #e6f7e9 0%, #f0e6f7 100%);
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            overflow: hidden;
         }
 
         .container {
             width: 100%;
-            max-width: 420px;
-            height: 700px;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .screen {
-            display: none;
-            flex-direction: column;
             height: 100%;
-        }
-
-        .active {
             display: flex;
-        }
-
-        /* Écran de mot de passe */
-        .password-screen {
             justify-content: center;
             align-items: center;
-            padding: 40px;
-            text-align: center;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
-            color: white;
         }
 
-        .logo {
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-
-        .app-name {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 30px;
-        }
-
-        .password-form {
-            width: 100%;
-        }
-
-        .password-input {
-            width: 100%;
-            padding: 16px;
-            margin: 15px 0;
-            border: none;
-            border-radius: 25px;
-            font-size: 18px;
-            text-align: center;
-            outline: none;
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        .password-btn {
+        /* Écran d'accueil */
+        .login-screen {
             background-color: white;
-            color: #ff6b6b;
-            border: none;
-            padding: 16px;
-            width: 100%;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .password-btn:hover {
-            background-color: #f8f9fa;
-            transform: translateY(-2px);
-        }
-
-        /* Écran de sélection d'utilisateur */
-        .user-screen {
-            justify-content: center;
-            align-items: center;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             padding: 40px;
+            width: 400px;
             text-align: center;
-            background: #f0f2f5;
+            animation: fadeIn 0.5s ease;
         }
 
-        .user-title {
-            font-size: 24px;
-            color: #3b4a54;
-            margin-bottom: 40px;
-            font-weight: 500;
+        .login-screen h1 {
+            color: #128C7E;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .login-screen p {
+            color: #667781;
+            margin-bottom: 30px;
+            font-size: 16px;
         }
 
         .user-buttons {
             display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
+            justify-content: space-between;
+            margin-bottom: 30px;
         }
 
         .user-btn {
-            border: none;
-            padding: 18px;
-            border-radius: 12px;
+            flex: 1;
+            margin: 0 10px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
             font-size: 18px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
+            transition: all 0.3s ease;
         }
 
         .user-btn:hover {
@@ -141,394 +79,343 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .ahmed-btn {
-            background-color: #0084ff;
-            color: white;
+        .user-btn.active {
+            border-color: #128C7E;
+            background-color: #e8f5e9;
+            color: #128C7E;
         }
 
-        .ida-btn {
-            background-color: #ff6b6b;
-            color: white;
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
         }
 
-        /* Écran de messagerie */
+        .password-input:focus {
+            outline: none;
+            border-color: #128C7E;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: #128C7E;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .login-btn:hover {
+            background-color: #0a6b5a;
+        }
+
+        .error-message {
+            color: #f44336;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Interface de chat */
+        .chat-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            max-width: 1400px;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
         .chat-header {
-            background-color: #f0f2f5;
-            padding: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #e9edef;
-        }
-
-        .user-info {
+            background-color: #f0f0f0;
+            padding: 15px 20px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            border-bottom: 1px solid #e0e0e0;
         }
 
-        .user-avatar {
-            width: 44px;
-            height: 44px;
+        .avatar {
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
+            background-color: #128C7E;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-weight: bold;
             color: white;
-            font-size: 18px;
+            font-weight: bold;
+            font-size: 20px;
+            margin-right: 15px;
         }
 
-        .ahmed-avatar {
-            background-color: #0084ff;
-        }
-
-        .ida-avatar {
-            background-color: #ff6b6b;
-        }
-
-        .user-details {
-            display: flex;
-            flex-direction: column;
+        .user-info {
+            flex: 1;
         }
 
         .user-name {
             font-weight: 600;
-            color: #3b4a54;
+            font-size: 18px;
         }
 
-        .online-status {
-            font-size: 13px;
+        .user-status {
+            font-size: 14px;
             color: #667781;
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
 
-        .online-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #00a884;
+        .online {
+            color: #128C7E;
         }
 
-        .offline-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #667781;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 20px;
-            color: #54656f;
-        }
-
-        .header-actions i {
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .chat-container {
-            flex: 1;
-            padding: 16px;
+        .chat-messages {
+            height: calc(100% - 130px);
+            padding: 20px;
             overflow-y: auto;
-            background-color: #efeae2;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%2300a884' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            background-color: #e5ddd5;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
         }
 
         .message {
-            max-width: 75%;
-            margin-bottom: 8px;
-            position: relative;
-            word-wrap: break-word;
-            font-size: 15px;
-            line-height: 1.4;
-        }
-
-        .text-message {
-            padding: 8px 12px;
+            max-width: 70%;
+            margin-bottom: 15px;
+            padding: 10px 15px;
             border-radius: 8px;
+            position: relative;
+            animation: fadeInUp 0.3s ease;
         }
 
         .sent {
+            background-color: #dcf8c6;
             margin-left: auto;
-        }
-
-        .sent .text-message {
-            background-color: #d9fdd3;
             border-top-right-radius: 0;
         }
 
         .received {
+            background-color: white;
             margin-right: auto;
+            border-top-left-radius: 0;
         }
 
-        .received .text-message {
-            background-color: white;
-            border-top-left-radius: 0;
-            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        .message-content {
+            word-wrap: break-word;
         }
 
         .message-time {
-            font-size: 11px;
-            text-align: right;
-            margin-top: 4px;
+            font-size: 12px;
             color: #667781;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 4px;
-            padding: 0 4px;
+            text-align: right;
+            margin-top: 5px;
         }
 
         .message-status {
-            color: #53bdeb;
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 12px;
         }
 
-        .message-image {
+        .seen {
+            color: #34B7F1;
+        }
+
+        .message-image, .message-video {
             max-width: 100%;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            max-height: 200px;
-            object-fit: cover;
+            border-radius: 5px;
+            margin-top: 5px;
         }
 
-        .message-image:hover {
-            transform: scale(1.02);
-        }
-
-        .audio-message {
+        .message-audio {
             display: flex;
             align-items: center;
-            gap: 10px;
+            margin-top: 5px;
         }
 
         .audio-player {
             flex: 1;
-            height: 32px;
+            height: 30px;
+            margin-left: 10px;
         }
 
-        .chat-input-container {
+        .chat-input {
+            height: 80px;
+            padding: 10px 15px;
+            background-color: #f0f0f0;
             display: flex;
-            padding: 10px 16px;
-            background-color: #f0f2f5;
-            align-items: flex-end;
-            gap: 10px;
+            align-items: center;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .input-actions {
+            display: flex;
+            margin-right: 15px;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: transparent;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #54656f;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .action-btn:hover {
+            background-color: #e0e0e0;
         }
 
         .message-input {
             flex: 1;
-            padding: 12px 16px;
+            padding: 12px 15px;
             border: none;
-            border-radius: 24px;
+            border-radius: 20px;
+            font-size: 16px;
             outline: none;
             resize: none;
-            max-height: 100px;
-            font-size: 15px;
-            background-color: white;
-            line-height: 1.4;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            font-size: 20px;
-            color: #54656f;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background-color 0.2s;
-        }
-
-        .action-btn:hover {
-            background-color: #e9edef;
+            max-height: 50px;
         }
 
         .send-btn {
-            background-color: #0084ff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #128C7E;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             color: white;
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 15px;
+            transition: background-color 0.3s;
         }
 
         .send-btn:hover {
-            background-color: #007ae6;
+            background-color: #0a6b5a;
         }
 
-        .recording {
-            animation: pulse 1s infinite;
-            background-color: #ff6b6b;
-            color: white;
+        .recording-indicator {
+            display: none;
+            align-items: center;
+            color: #f44336;
+            margin-right: 15px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .recording-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #f44336;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
-        .hidden {
-            display: none;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        /* Thème Ahmed */
-        .ahmed-theme .chat-container {
-            background-color: #e5f6ff;
-        }
-
-        .ahmed-theme .sent .text-message {
-            background-color: #0084ff;
-            color: white;
-        }
-
-        .ahmed-theme .message-time {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        /* Thème Ida */
-        .ida-theme .chat-container {
-            background-color: #fff0f0;
-        }
-
-        .ida-theme .sent .text-message {
-            background-color: #ff6b6b;
-            color: white;
-        }
-
-        .ida-theme .message-time {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        /* Modal pour image plein écran */
-        .image-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .image-modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            max-width: 90%;
-            max-height: 90%;
-        }
-
-        .modal-content img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: white;
-            font-size: 40px;
-            cursor: pointer;
-            z-index: 1001;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chat-container {
+                border-radius: 0;
+                height: 100vh;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Écran de mot de passe -->
-        <div id="passwordScreen" class="screen active">
-            <div class="password-screen">
-                <div class="logo"><i class="fas fa-heart"></i></div>
-                <div class="app-name">Notre Messagerie</div>
-                <div class="password-form">
-                    <input type="password" id="passwordInput" class="password-input" placeholder="Mot de passe (0000)" maxlength="4">
-                    <button id="passwordBtn" class="password-btn">Entrer</button>
-                </div>
+        <!-- Écran d'accueil -->
+        <div class="login-screen" id="loginScreen">
+            <h1>Notre Messagerie</h1>
+            <p>Choisis ton identité</p>
+            
+            <div class="user-buttons">
+                <button class="user-btn" id="ahmedBtn">AHMED</button>
+                <button class="user-btn" id="idaBtn">IDA</button>
+            </div>
+            
+            <div id="passwordSection" style="display: none;">
+                <input type="password" class="password-input" id="passwordInput" placeholder="Mot de passe à 4 chiffres" maxlength="4">
+                <button class="login-btn" id="loginBtn">Se connecter</button>
+                <div class="error-message" id="errorMessage">Mot de passe incorrect. Essayez 0000</div>
             </div>
         </div>
-
-        <!-- Écran de sélection d'utilisateur -->
-        <div id="userScreen" class="screen">
-            <div class="user-screen">
-                <div class="user-title">Qui êtes-vous ?</div>
-                <div class="user-buttons">
-                    <button id="ahmedBtn" class="user-btn ahmed-btn">
-                        <i class="fas fa-male"></i>
-                        AHMED
-                    </button>
-                    <button id="idaBtn" class="user-btn ida-btn">
-                        <i class="fas fa-female"></i>
-                        IDA
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Écran de messagerie -->
-        <div id="chatScreen" class="screen">
+        
+        <!-- Interface de chat -->
+        <div class="chat-container" id="chatContainer">
             <div class="chat-header">
+                <div class="avatar" id="partnerAvatar">I</div>
                 <div class="user-info">
-                    <div id="userAvatar" class="user-avatar ahmed-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="user-details">
-                        <div id="userName" class="user-name">Ahmed</div>
-                        <div class="online-status">
-                            <div id="partnerStatusDot" class="offline-dot"></div>
-                            <span id="partnerStatus">Hors ligne</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="header-actions">
-                    <i class="fas fa-video"></i>
-                    <i class="fas fa-phone"></i>
-                    <i class="fas fa-ellipsis-vertical"></i>
+                    <div class="user-name" id="partnerName">IDA</div>
+                    <div class="user-status" id="partnerStatus">En ligne</div>
                 </div>
             </div>
-            <div id="chatContainer" class="chat-container">
+            
+            <div class="chat-messages" id="chatMessages">
                 <!-- Les messages seront ajoutés ici dynamiquement -->
             </div>
-            <div class="chat-input-container">
-                <button id="attachBtn" class="action-btn">
-                    <i class="fas fa-paperclip"></i>
-                </button>
-                <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
-                <textarea id="messageInput" class="message-input" placeholder="Tapez votre message..." rows="1"></textarea>
-                <button id="recordBtn" class="action-btn">
-                    <i class="fas fa-microphone"></i>
-                </button>
-                <button id="sendBtn" class="action-btn send-btn">
+            
+            <div class="chat-input">
+                <div class="input-actions">
+                    <button class="action-btn" id="imageBtn">
+                        <i class="fas fa-image"></i>
+                    </button>
+                    <button class="action-btn" id="videoBtn">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="action-btn" id="audioBtn">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+                
+                <div class="recording-indicator" id="recordingIndicator">
+                    <div class="recording-dot"></div>
+                    <span>Enregistrement...</span>
+                </div>
+                
+                <textarea class="message-input" id="messageInput" placeholder="Tapez un message..."></textarea>
+                
+                <button class="send-btn" id="sendBtn">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal pour image plein écran -->
-    <div id="imageModal" class="image-modal">
-        <span class="close-modal">&times;</span>
-        <div class="modal-content">
-            <img id="fullSizeImage" src="" alt="Image en plein écran">
-        </div>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script>
         // Configuration Firebase
         const firebaseConfig = {
@@ -541,401 +428,418 @@
             measurementId: "G-SW6XGD9YHY"
         };
 
-        // Initialisation Firebase
+        // Initialiser Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
         // Variables globales
         let currentUser = null;
+        let partnerName = null;
         let mediaRecorder = null;
         let audioChunks = [];
         let isRecording = false;
-        let unsubscribeMessages = null;
 
         // Éléments DOM
-        const passwordScreen = document.getElementById('passwordScreen');
-        const userScreen = document.getElementById('userScreen');
-        const chatScreen = document.getElementById('chatScreen');
-        const passwordInput = document.getElementById('passwordInput');
-        const passwordBtn = document.getElementById('passwordBtn');
+        const loginScreen = document.getElementById('loginScreen');
+        const chatContainer = document.getElementById('chatContainer');
         const ahmedBtn = document.getElementById('ahmedBtn');
         const idaBtn = document.getElementById('idaBtn');
-        const userName = document.getElementById('userName');
-        const userAvatar = document.getElementById('userAvatar');
-        const partnerStatusDot = document.getElementById('partnerStatusDot');
+        const passwordSection = document.getElementById('passwordSection');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const partnerAvatar = document.getElementById('partnerAvatar');
+        const partnerNameElement = document.getElementById('partnerName');
         const partnerStatus = document.getElementById('partnerStatus');
-        const chatContainer = document.getElementById('chatContainer');
+        const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
-        const attachBtn = document.getElementById('attachBtn');
-        const fileInput = document.getElementById('fileInput');
-        const recordBtn = document.getElementById('recordBtn');
-        const container = document.querySelector('.container');
-        const imageModal = document.getElementById('imageModal');
-        const fullSizeImage = document.getElementById('fullSizeImage');
-        const closeModal = document.querySelector('.close-modal');
+        const imageBtn = document.getElementById('imageBtn');
+        const videoBtn = document.getElementById('videoBtn');
+        const audioBtn = document.getElementById('audioBtn');
+        const recordingIndicator = document.getElementById('recordingIndicator');
 
         // Vérifier si l'utilisateur est déjà connecté
-        window.addEventListener('DOMContentLoaded', () => {
+        window.onload = function() {
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
-                // L'utilisateur est déjà connecté, passer directement à la messagerie
                 currentUser = savedUser;
-                showChatScreen();
-                setupUser();
-                loadMessages();
-                setupPresence();
-            } else {
-                // Nouvel utilisateur, afficher l'écran de mot de passe
-                passwordScreen.classList.add('active');
+                partnerName = currentUser === 'AHMED' ? 'IDA' : 'AHMED';
+                initializeChat();
             }
+        };
+
+        // Gestion des boutons d'utilisateur
+        ahmedBtn.addEventListener('click', function() {
+            selectUser('AHMED');
         });
 
-        // Gestion du mot de passe
-        passwordBtn.addEventListener('click', checkPassword);
-        passwordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') checkPassword();
+        idaBtn.addEventListener('click', function() {
+            selectUser('IDA');
         });
-
-        function checkPassword() {
-            if (passwordInput.value === '0000') {
-                passwordScreen.classList.remove('active');
-                userScreen.classList.add('active');
-            } else {
-                alert('Mot de passe incorrect. Essayez 0000.');
-                passwordInput.value = '';
-            }
-        }
-
-        // Sélection de l'utilisateur (une seule fois)
-        ahmedBtn.addEventListener('click', () => selectUser('Ahmed'));
-        idaBtn.addEventListener('click', () => selectUser('Ida'));
 
         function selectUser(user) {
             currentUser = user;
-            // Sauvegarder dans le localStorage pour les futures connexions
-            localStorage.setItem('currentUser', user);
-            userScreen.classList.remove('active');
-            showChatScreen();
-            setupUser();
-            loadMessages();
-            setupPresence();
+            partnerName = user === 'AHMED' ? 'IDA' : 'AHMED';
+            
+            // Mettre en surbrillance le bouton sélectionné
+            ahmedBtn.classList.toggle('active', user === 'AHMED');
+            idaBtn.classList.toggle('active', user === 'IDA');
+            
+            // Afficher la section mot de passe
+            passwordSection.style.display = 'block';
         }
 
-        function setupUser() {
-            userName.textContent = currentUser;
-            
-            if (currentUser === 'Ahmed') {
-                userAvatar.innerHTML = '<i class="fas fa-male"></i>';
-                userAvatar.className = 'user-avatar ahmed-avatar';
-                container.classList.add('ahmed-theme');
-                container.classList.remove('ida-theme');
+        // Gestion de la connexion
+        loginBtn.addEventListener('click', function() {
+            const password = passwordInput.value;
+            if (password === '0000') {
+                // Enregistrer l'utilisateur dans localStorage
+                localStorage.setItem('currentUser', currentUser);
+                
+                // Initialiser le chat
+                initializeChat();
             } else {
-                userAvatar.innerHTML = '<i class="fas fa-female"></i>';
-                userAvatar.className = 'user-avatar ida-avatar';
-                container.classList.add('ida-theme');
-                container.classList.remove('ahmed-theme');
+                errorMessage.style.display = 'block';
             }
+        });
+
+        // Permettre la connexion avec la touche Entrée
+        passwordInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                loginBtn.click();
+            }
+        });
+
+        // Initialiser l'interface de chat
+        function initializeChat() {
+            // Masquer l'écran de connexion et afficher le chat
+            loginScreen.style.display = 'none';
+            chatContainer.style.display = 'block';
+            
+            // Mettre à jour l'interface avec les informations du partenaire
+            partnerNameElement.textContent = partnerName;
+            partnerAvatar.textContent = partnerName.charAt(0);
+            
+            // Mettre à jour le statut en ligne
+            updateOnlineStatus(true);
+            
+            // Écouter les changements de statut du partenaire
+            listenToPartnerStatus();
+            
+            // Charger les messages existants
+            loadMessages();
+            
+            // Écouter les nouveaux messages
+            listenToNewMessages();
+            
+            // Mettre à jour le statut de lecture des messages
+            markMessagesAsSeen();
         }
 
-        function showChatScreen() {
-            chatScreen.classList.add('active');
+        // Mettre à jour le statut en ligne dans Firestore
+        function updateOnlineStatus(isOnline) {
+            db.collection('users').doc(currentUser).set({
+                isOnline: isOnline,
+                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+            });
         }
 
-        // Configuration de la présence en ligne
-        function setupPresence() {
-            const partner = currentUser === 'Ahmed' ? 'Ida' : 'Ahmed';
-            
-            // Référence à la présence du partenaire
-            const partnerPresenceRef = db.collection('presence').doc(partner);
-            
-            // Mettre à jour la présence de l'utilisateur actuel
-            const userPresenceRef = db.collection('presence').doc(currentUser);
-            
-            // Écouter les changements de présence du partenaire
-            partnerPresenceRef.onSnapshot((doc) => {
+        // Écouter les changements de statut du partenaire
+        function listenToPartnerStatus() {
+            db.collection('users').doc(partnerName).onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
-                    if (data.online) {
-                        partnerStatusDot.className = 'online-dot';
+                    if (data.isOnline) {
                         partnerStatus.textContent = 'En ligne';
+                        partnerStatus.classList.add('online');
                     } else {
-                        partnerStatusDot.className = 'offline-dot';
-                        partnerStatus.textContent = 'Hors ligne';
+                        partnerStatus.textContent = `Hors ligne - ${formatLastSeen(data.lastSeen)}`;
+                        partnerStatus.classList.remove('online');
                     }
                 }
             });
-            
-            // Mettre à jour la présence de l'utilisateur actuel
-            userPresenceRef.set({
-                online: true,
-                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            // Gérer la déconnexion
-            window.addEventListener('beforeunload', () => {
-                userPresenceRef.set({
-                    online: false,
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                // Se désabonner des messages
-                if (unsubscribeMessages) {
-                    unsubscribeMessages();
-                }
-            });
         }
 
-        // Chargement des messages
-        function loadMessages() {
-            // Se désabonner d'abord s'il y a un abonnement existant
-            if (unsubscribeMessages) {
-                unsubscribeMessages();
-            }
+        // Formater la date de dernière connexion
+        function formatLastSeen(timestamp) {
+            if (!timestamp) return '';
             
-            unsubscribeMessages = db.collection('messages')
+            const date = timestamp.toDate();
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return 'à l\'instant';
+            if (diffMins < 60) return `il y a ${diffMins} min`;
+            
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `il y a ${diffHours} h`;
+            
+            return `le ${date.toLocaleDateString()}`;
+        }
+
+        // Charger les messages depuis Firestore
+        function loadMessages() {
+            db.collection('messages')
                 .orderBy('timestamp', 'asc')
-                .onSnapshot((snapshot) => {
-                    chatContainer.innerHTML = '';
-                    snapshot.forEach((doc) => {
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
                         const message = doc.data();
-                        displayMessage(message, doc.id);
+                        displayMessage(message, false);
                     });
                     
-                    // Marquer les messages comme lus
-                    const partner = currentUser === 'Ahmed' ? 'Ida' : 'Ahmed';
-                    markMessagesAsRead(partner);
-                    
+                    // Faire défiler vers le bas pour voir les derniers messages
                     scrollToBottom();
                 });
         }
 
-        function displayMessage(message, messageId) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${message.sender === currentUser ? 'sent' : 'received'}`;
-            messageDiv.dataset.id = messageId;
+        // Écouter les nouveaux messages
+        function listenToNewMessages() {
+            db.collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot((querySnapshot) => {
+                    querySnapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const message = change.doc.data();
+                            displayMessage(message, true);
+                        }
+                    });
+                });
+        }
+
+        // Afficher un message dans l'interface
+        function displayMessage(message, isNew) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
             
-            let messageContent = '';
-            let hasBackground = false;
+            // Déterminer si le message est envoyé ou reçu
+            if (message.sender === currentUser) {
+                messageElement.classList.add('sent');
+            } else {
+                messageElement.classList.add('received');
+            }
+            
+            // Contenu du message
+            let contentHtml = '';
             
             if (message.type === 'text') {
-                messageContent = `<div class="text-message">${message.content}</div>`;
-                hasBackground = true;
+                contentHtml = `<div class="message-content">${message.content}</div>`;
             } else if (message.type === 'image') {
-                // Image sans fond
-                messageContent = `
-                    <img src="${message.imageUrl}" class="message-image" alt="Image envoyée" data-fullimage="${message.imageUrl}">
+                contentHtml = `
+                    <div class="message-content">${message.caption || ''}</div>
+                    <img class="message-image" src="${message.content}" alt="Image partagée">
+                `;
+            } else if (message.type === 'video') {
+                contentHtml = `
+                    <div class="message-content">${message.caption || ''}</div>
+                    <video class="message-video" controls>
+                        <source src="${message.content}" type="video/mp4">
+                        Votre navigateur ne supporte pas la lecture de vidéos.
+                    </video>
                 `;
             } else if (message.type === 'audio') {
-                // Audio sans fond
-                messageContent = `
-                    <div class="audio-message">
-                        <i class="fas fa-play-circle" style="font-size: 24px;"></i>
-                        <audio controls class="audio-player">
+                contentHtml = `
+                    <div class="message-audio">
+                        <i class="fas fa-play-circle" style="font-size: 24px; color: #128C7E;"></i>
+                        <audio class="audio-player" controls>
                             <source src="${message.content}" type="audio/wav">
+                            Votre navigateur ne supporte pas la lecture audio.
                         </audio>
                     </div>
                 `;
             }
             
-            const time = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Maintenant';
+            // Heure du message
+            const time = message.timestamp ? message.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
-            messageDiv.innerHTML = `
-                ${messageContent}
-                <div class="message-time">
-                    ${time}
-                    ${message.sender === currentUser ? 
-                        `<span class="message-status">${message.read ? '<i class="fas fa-check-double"></i>' : '<i class="fas fa-check"></i>'}</span>` : 
-                        ''
-                    }
-                </div>
+            // Statut du message (uniquement pour les messages envoyés)
+            let statusHtml = '';
+            if (message.sender === currentUser) {
+                const statusClass = message.seen ? 'seen' : '';
+                statusHtml = `<div class="message-status ${statusClass}">✓✓</div>`;
+            }
+            
+            messageElement.innerHTML = `
+                ${contentHtml}
+                <div class="message-time">${time}</div>
+                ${statusHtml}
             `;
             
-            chatContainer.appendChild(messageDiv);
+            // Ajouter le message à l'interface
+            if (isNew) {
+                chatMessages.appendChild(messageElement);
+                scrollToBottom();
+            } else {
+                chatMessages.appendChild(messageElement);
+            }
+        }
+
+        // Faire défiler vers le bas de la conversation
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Envoyer un message
+        function sendMessage(type, content, caption = '') {
+            const message = {
+                sender: currentUser,
+                type: type,
+                content: content,
+                caption: caption,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                seen: false
+            };
             
-            // Ajouter l'événement pour l'image plein écran
-            if (message.type === 'image') {
-                const imgElement = messageDiv.querySelector('.message-image');
-                imgElement.addEventListener('click', () => {
-                    fullSizeImage.src = imgElement.dataset.fullimage;
-                    imageModal.classList.add('active');
+            db.collection('messages').add(message)
+                .then(() => {
+                    // Réinitialiser le champ de saisie pour les messages texte
+                    if (type === 'text') {
+                        messageInput.value = '';
+                    }
+                })
+                .catch((error) => {
+                    console.error('Erreur lors de l\'envoi du message: ', error);
                 });
-            }
         }
 
-        // Fermer le modal
-        closeModal.addEventListener('click', () => {
-            imageModal.classList.remove('active');
-        });
-
-        imageModal.addEventListener('click', (e) => {
-            if (e.target === imageModal) {
-                imageModal.classList.remove('active');
+        // Gestion de l'envoi de message texte
+        sendBtn.addEventListener('click', function() {
+            const message = messageInput.value.trim();
+            if (message) {
+                sendMessage('text', message);
             }
         });
 
-        // Envoi de messages
-        sendBtn.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
+        // Permettre l'envoi avec la touche Entrée
+        messageInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendBtn.click();
             }
         });
 
-        // Ajuster la hauteur du textarea automatiquement
-        messageInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-        });
-
-        function sendMessage() {
-            const content = messageInput.value.trim();
-            if (content) {
-                const message = {
-                    sender: currentUser,
-                    content: content,
-                    type: 'text',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    read: false
-                };
-                
-                db.collection('messages').add(message);
-                messageInput.value = '';
-                messageInput.style.height = 'auto';
-            }
+        // Marquer les messages comme lus
+        function markMessagesAsSeen() {
+            db.collection('messages')
+                .where('sender', '==', partnerName)
+                .where('seen', '==', false)
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        db.collection('messages').doc(doc.id).update({
+                            seen: true
+                        });
+                    });
+                });
         }
 
-        // Envoi de fichiers
-        attachBtn.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', handleFileUpload);
-
-        function handleFileUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+        // Gestion de l'envoi d'images
+        imageBtn.addEventListener('click', function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
             
-            // Pour les images
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const imageMessage = {
-                        sender: currentUser,
-                        content: '',
-                        imageUrl: event.target.result,
-                        type: 'image',
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                        read: false
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        const base64 = event.target.result;
+                        sendMessage('image', base64, 'Image partagée');
                     };
                     
-                    db.collection('messages').add(imageMessage);
-                };
-                reader.readAsDataURL(file);
-            }
+                    reader.readAsDataURL(file);
+                }
+            };
             
-            // Pour les vidéos
-            else if (file.type.startsWith('video/')) {
-                const videoMessage = {
-                    sender: currentUser,
-                    content: `Vidéo: ${file.name}`,
-                    type: 'text',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    read: false
-                };
-                
-                db.collection('messages').add(videoMessage);
-            }
+            input.click();
+        });
+
+        // Gestion de l'envoi de vidéos
+        videoBtn.addEventListener('click', function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'video/*';
             
-            fileInput.value = '';
-        }
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        const base64 = event.target.result;
+                        sendMessage('video', base64, 'Vidéo partagée');
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            input.click();
+        });
 
-        // Enregistrement audio
-        recordBtn.addEventListener('click', toggleRecording);
-
-        function toggleRecording() {
+        // Gestion de l'enregistrement audio
+        audioBtn.addEventListener('click', function() {
             if (!isRecording) {
                 startRecording();
             } else {
                 stopRecording();
             }
-        }
+        });
 
+        // Démarrer l'enregistrement audio
         function startRecording() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ audio: true })
-                    .then(stream => {
-                        mediaRecorder = new MediaRecorder(stream);
-                        audioChunks = [];
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = function(event) {
+                        audioChunks.push(event.data);
+                    };
+                    
+                    mediaRecorder.onstop = function() {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const reader = new FileReader();
                         
-                        mediaRecorder.ondataavailable = (e) => {
-                            audioChunks.push(e.data);
+                        reader.onload = function(event) {
+                            const base64 = event.target.result;
+                            sendMessage('audio', base64);
                         };
                         
-                        mediaRecorder.onstop = () => {
-                            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                            const audioUrl = URL.createObjectURL(audioBlob);
-                            
-                            const audioMessage = {
-                                sender: currentUser,
-                                content: audioUrl,
-                                type: 'audio',
-                                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                                read: false
-                            };
-                            
-                            db.collection('messages').add(audioMessage);
-                        };
-                        
-                        mediaRecorder.start();
-                        isRecording = true;
-                        recordBtn.classList.add('recording');
-                    })
-                    .catch(error => {
-                        console.error('Erreur d\'accès au microphone:', error);
-                        alert('Impossible d\'accéder au microphone');
-                    });
-            } else {
-                alert('Votre navigateur ne supporte pas l\'enregistrement audio');
-            }
+                        reader.readAsDataURL(audioBlob);
+                    };
+                    
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordingIndicator.style.display = 'flex';
+                    audioBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                })
+                .catch(function(error) {
+                    console.error('Erreur d\'accès au microphone: ', error);
+                });
         }
 
+        // Arrêter l'enregistrement audio
         function stopRecording() {
             if (mediaRecorder && isRecording) {
                 mediaRecorder.stop();
                 isRecording = false;
-                recordBtn.classList.remove('recording');
+                recordingIndicator.style.display = 'none';
+                audioBtn.innerHTML = '<i class="fas fa-microphone"></i>';
                 
-                // Arrêter tous les tracks du stream
+                // Arrêter toutes les pistes audio
                 mediaRecorder.stream.getTracks().forEach(track => track.stop());
             }
         }
 
-        // Marquer les messages comme lus
-        function markMessagesAsRead(sender) {
-            db.collection('messages')
-                .where('sender', '==', sender)
-                .where('read', '==', false)
-                .get()
-                .then((snapshot) => {
-                    const batch = db.batch();
-                    
-                    snapshot.forEach((doc) => {
-                        const messageRef = db.collection('messages').doc(doc.id);
-                        batch.update(messageRef, { read: true });
-                    });
-                    
-                    if (snapshot.size > 0) {
-                        return batch.commit();
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur lors du marquage des messages comme lus:', error);
-                });
-        }
-
-        // Défilement automatique vers le bas
-        function scrollToBottom() {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+        // Gérer la déconnexion
+        window.addEventListener('beforeunload', function() {
+            updateOnlineStatus(false);
+        });
     </script>
 </body>
 </html>
